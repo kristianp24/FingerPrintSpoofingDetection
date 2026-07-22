@@ -1,52 +1,55 @@
 import numpy as np
 import scipy as sp
 
-def calculate_mean(D):
-    return D.mean(1) # calculates the mean column-wise
+class LDA:
+    def __init__(self, Data, L, no_clases, direction=1):
+        self.D = Data
+        self.L = L
+        self.no_clases = no_clases
+        self.direction = direction
 
-def center_data(D, mu):
-    # Now we center data (remove mu form all points)
-    # Firstly we reshape mu to be a column vector
-    mu = mu.reshape((mu.size, 1))
-    return D - mu
+    def calculate_mean(self, D):
+        return D.mean(axis=1)
 
-def compute_SWC(D, L, val):
-    summed = np.zeros((D.shape[0], D.shape[0]))
-    summedSb = np.zeros((D.shape[0], D.shape[0]))
-    N = D.shape[1]
-    global_mean = calculate_mean(D)
-    global_mean = global_mean.reshape((global_mean.size, 1))
-    for i in np.unique(L):
-        dcls = D[:, L==i]
-        mean = calculate_mean(dcls)
-        DCs = center_data(dcls, mean)
-        L1 = list(L)
-        n = L1.count(i)
-        SWc = (DCs @ DCs.T) / float(n)
-        # print("Class: ", i)
-        # print("/n")
-        summed += (SWc * n)
+    def center_data(self, D, mu):
+        mu = mu.reshape((-1, 1))
+        return D - mu
 
-        diffMeans = mean.reshape((mean.size, 1)) - global_mean
-        summedSb += (float(n) * (diffMeans @ diffMeans.T))
+    def compute_SWC(self, D, L):
+        num_features, N = D.shape
+        summed_SW = np.zeros((num_features, num_features))
+        summed_SB = np.zeros((num_features, num_features))
+        
+        global_mean = self.calculate_mean(D).reshape((-1, 1))
 
-    
-    SW = summed / float(N)
-    SB = summedSb / float(N)
-    print("SW: ")
-    print("/n")
-    print(SW)
-    print("SB:")
-    print(SB)
-    return SW, SB
+        for i in np.unique(L):
+            dcls = D[:, L == i]
+            n = dcls.shape[1]
+            
+            mean_cls = self.calculate_mean(dcls).reshape((-1, 1))
+            DCs = self.center_data(dcls, mean_cls)
+            
+            summed_SW += (DCs @ DCs.T)
 
-def train_lda(D, L, no_clases, direction = 1):
-    SW, SB = compute_SWC(D, L, val=no_clases)
-    s, U = sp.linalg.eigh(SB, SW)
-    
-    W = U[:, ::-1][:, 0:direction]
-    W=-W
+            diff_means = mean_cls - global_mean
+            summed_SB += float(n) * (diff_means @ diff_means.T)
 
-    DP = np.dot(W.T, D)
+        SW = summed_SW / float(N)
+        SB = summed_SB / float(N)
+        
+        return SW, SB
 
-    return DP, W    
+    def train_lda(self):
+        SW, SB = self.compute_SWC(self.D, self.L)
+        
+        s, U = sp.linalg.eigh(SB, SW)
+        
+        W = U[:, ::-1][:, 0:self.direction]
+
+        DP_temp = np.dot(W.T, self.D)
+        if DP_temp[0, self.L == 1].mean() < DP_temp[0, self.L == 0].mean():
+            W = -W
+
+        DP = np.dot(W.T, self.D)
+
+        return DP, W

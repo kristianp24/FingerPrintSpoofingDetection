@@ -1,26 +1,15 @@
-from lda import train_lda
+from lda import LDA
 import numpy 
-from implementation_pca_lda import load, plot_simple_hist
-
-def split_db_2to1(D, L, seed=1):
-    nTrain = int(D.shape[1]*2.0/3.0)
-    numpy.random.seed(seed)
-    idx = numpy.random.permutation(D.shape[1])
-    idxTrain = idx[0:nTrain]
-    idxTest = idx[nTrain:]
-    DTR = D[:, idxTrain]
-    DVAL = D[:, idxTest]
-    LTR = L[idxTrain]
-    LVAL = L[idxTest]
-    return (DTR, LTR), (DVAL, LVAL)
+from utils import load, plot_simple_hist, split_db_2to1
 
 
 if __name__ == "__main__":
-    D, L = load("FingerPrintSpoofingDetection/data/trainData.txt")
+    D, L = load("data/trainData.txt")
 
     (DTR, LTR), (DVAL, LVAL) = split_db_2to1(D, L)
 
-    DTR_proj, W = train_lda(DTR, LTR, 2, 1)
+    lda = LDA(DTR, LTR, 2, 1)
+    DTR_proj, W = lda.train_lda()
 
     DVAL_proj = numpy.dot(W.T, DVAL)
 
