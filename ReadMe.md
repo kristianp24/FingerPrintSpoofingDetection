@@ -24,8 +24,8 @@
     $$\text{Threshold} = \frac{\mu_{0, \text{proj}} + \mu_{1, \text{proj}}}{2}$$
 
   * Predicts class labels for validation samples based on position relative to threshold:
-
-    $$\hat{y} = \begin{cases} 1 & \text{if } D_{\text{VAL, proj}} \ge \text{Threshold} \\\\ 0 & \text{if } D_{\text{VAL, proj}} < \text{Threshold} \end{cases}$$
+    $$\hat{y} = \mathbf{1}\left( D_{\text{VAL, proj}} \ge \text{Threshold} \right)$$
+    
 * **Evaluation & Metrics:** Calculates validation classification errors and prints original vs. predicted labels along with total misclassifications.
 * **Visualization:** Plots sample distribution histograms for projected training and validation sets using `plot_simple_hist`.
 
@@ -40,8 +40,7 @@ Implementation of generative Gaussian classifiers for multivariate data modeling
 
 * **Class Parameter Estimation:** 
   Estimates Maximum Likelihood (ML) parameters for each class $c$:
-  $$\mu_c^* = \frac{1}{N_c} \sum_{i=1}^{N_c} x_{c,i}$$
-  $$\Sigma_c^* = \frac{1}{N_c} \sum_{i=1}^{N_c} (x_{c,i} - \mu_c^*)(x_{c,i} - \mu_c^*)^T$$
+  $$\mu_c^* = \frac{1}{N_c} \sum_{i=1}^{N_c} x_{c,i}, \quad \Sigma_c^* = \frac{1}{N_c} \sum_{i=1}^{N_c} (x_{c,i} - \mu_c^*)(x_{c,i} - \mu_c^*)^T$$
 
 * **Model Variants:**
   * **Standard Multivariate Gaussian (MVG):** Computes class-conditional densities using full, class-specific covariance matrices $\Sigma_c^*$.
