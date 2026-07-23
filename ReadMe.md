@@ -22,8 +22,10 @@
 * **Threshold-Based Decision Rule:**
   * Calculates optimal threshold as the midpoint between projected training class means:
     $$\text{Threshold} = \frac{\mu_{0, \text{proj}} + \mu_{1, \text{proj}}}{2}$$
+
   * Predicts class labels for validation samples based on position relative to threshold:
-    $$\hat{y} = \begin{cases} 1 & \text{if } D_{\text{VAL, proj}} \ge \text{Threshold} \\ 0 & \text{if } D_{\text{VAL, proj}} < \text{Threshold} \end{cases}$$
+
+    $$\hat{y} = \begin{cases} 1 & \text{if } D_{\text{VAL, proj}} \ge \text{Threshold} \\\\ 0 & \text{if } D_{\text{VAL, proj}} < \text{Threshold} \end{cases}$$
 * **Evaluation & Metrics:** Calculates validation classification errors and prints original vs. predicted labels along with total misclassifications.
 * **Visualization:** Plots sample distribution histograms for projected training and validation sets using `plot_simple_hist`.
 
