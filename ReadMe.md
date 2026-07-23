@@ -27,14 +27,16 @@
 * **Evaluation & Metrics:** Calculates validation classification errors and prints original vs. predicted labels along with total misclassifications.
 * **Visualization:** Plots sample distribution histograms for projected training and validation sets using `plot_simple_hist`.
 
+---
+
 ### 4. Generative Gaussian Models (`gaussian.py`, `gaussian_classifier.py`)
 Implementation of generative Gaussian classifiers for multivariate data modeling and inference.
 
 * **Multivariate Gaussian Density Calculation:** 
   Evaluates log-likelihood densities for sample $x \in \mathbb{R}^M$ with mean vector $\mu$ and covariance matrix $\Sigma$:
-  $$\log f_{X}(x) = -\frac{M}{2} \log(2\pi) - \frac{1}{2} \log |\Sigma| - \frac{1}{2} (x - \mu)^T \Sigma^{-1} (x - \mu)$$
+  $$\log f_X(x) = -\frac{M}{2} \log(2\pi) - \frac{1}{2} \log |\Sigma| - \frac{1}{2} (x - \mu)^T \Sigma^{-1} (x - \mu)$$
 
-* **Class Parameter Estimation:**
+* **Class Parameter Estimation:** 
   Estimates Maximum Likelihood (ML) parameters for each class $c$:
   $$\mu_c^* = \frac{1}{N_c} \sum_{i=1}^{N_c} x_{c,i}$$
   $$\Sigma_c^* = \frac{1}{N_c} \sum_{i=1}^{N_c} (x_{c,i} - \mu_c^*)(x_{c,i} - \mu_c^*)^T$$
@@ -48,12 +50,10 @@ Implementation of generative Gaussian classifiers for multivariate data modeling
 
 * **Inference & Decision Rule:**
   * Computes log-posterior probabilities using the **log-sum-exp** trick for numerical stability:
-    $$\log f_{X,C}(x, c) = \log f_{X|C}(x|c) + \log P(C=c)$$
-    $$\log P(C=c|x) = \log f_{X,C}(x, c) - \log \sum_{c'} e^{\log f_{X,C}(x, c')}$$
+    $$\log f_{X,C}(x, c) = \log f_{X\|C}(x\|c) + \log P(C=c)$$
+    $$\log P(C=c\|x) = \log f_{X,C}(x, c) - \log \sum_{c'} e^{\log f_{X,C}(x, c')}$$
   * Predicts label based on maximum posterior probability:
-    $$\hat{y} = \arg\max_c P(C=c|x)$$
-
----
+    $$\hat{y} = \arg\max_c P(C=c\|x)$$
 
 ##  Prerequisites & Installation
 
