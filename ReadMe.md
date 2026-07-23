@@ -27,6 +27,32 @@
 * **Evaluation & Metrics:** Calculates validation classification errors and prints original vs. predicted labels along with total misclassifications.
 * **Visualization:** Plots sample distribution histograms for projected training and validation sets using `plot_simple_hist`.
 
+### 4. Generative Gaussian Models (`gaussian.py`, `gaussian_classifier.py`)
+Implementation of generative Gaussian classifiers for multivariate data modeling and inference.
+
+* **Multivariate Gaussian Density Calculation:** 
+  Evaluates log-likelihood densities for sample $x \in \mathbb{R}^M$ with mean vector $\mu$ and covariance matrix $\Sigma$:
+  $$\log f_{X}(x) = -\frac{M}{2} \log(2\pi) - \frac{1}{2} \log |\Sigma| - \frac{1}{2} (x - \mu)^T \Sigma^{-1} (x - \mu)$$
+
+* **Class Parameter Estimation:**
+  Estimates Maximum Likelihood (ML) parameters for each class $c$:
+  $$\mu_c^* = \frac{1}{N_c} \sum_{i=1}^{N_c} x_{c,i}$$
+  $$\Sigma_c^* = \frac{1}{N_c} \sum_{i=1}^{N_c} (x_{c,i} - \mu_c^*)(x_{c,i} - \mu_c^*)^T$$
+
+* **Model Variants:**
+  * **Standard Multivariate Gaussian (MVG):** Computes class-conditional densities using full, class-specific covariance matrices $\Sigma_c^*$.
+  * **Naive Bayes Gaussian:** Assumes conditionally independent features by zeroing off-diagonal elements, yielding diagonal covariance matrices:
+    $$\Sigma_{c, \text{Naive}} = \Sigma_c^* \odot I$$
+  * **Tied-Covariance Gaussian:** Assumes a shared covariance matrix across all classes, using the within-class covariance matrix $S_W$:
+    $$\Sigma_{\text{Tied}} = \frac{1}{N} \sum_{c} N_c \Sigma_c^*$$
+
+* **Inference & Decision Rule:**
+  * Computes log-posterior probabilities using the **log-sum-exp** trick for numerical stability:
+    $$\log f_{X,C}(x, c) = \log f_{X|C}(x|c) + \log P(C=c)$$
+    $$\log P(C=c|x) = \log f_{X,C}(x, c) - \log \sum_{c'} e^{\log f_{X,C}(x, c')}$$
+  * Predicts label based on maximum posterior probability:
+    $$\hat{y} = \arg\max_c P(C=c|x)$$
+
 ---
 
 ##  Prerequisites & Installation
@@ -70,10 +96,12 @@ For example we can see that features 3,4 may be linearly separable (but not at p
 
 ---
 
-## 🔬 Mathematical Overview
+##  Mathematical Overview
 
-| Algorithm | Objective | Key Equation |
+| Model | Objective | Key Equation |
 | :--- | :--- | :--- |
 | **PCA** | Maximize total variance | $C = \frac{1}{N} D_C D_C^T$ |
-| **LDA** | Maximize between-class variance relative to within-class variance | $S_B w = \lambda S_W w$ |
-```
+| **LDA** | Maximize between-class relative to within-class variance | $S_B w = \lambda S_W w$ |
+| **Multivariate Gaussian (MVG)** | Class-conditional density estimation | $\log f_{X\|C}(x\|c) = -\frac{M}{2}\log(2\pi) - \frac{1}{2}\log\|\Sigma_c\| - \frac{1}{2}(x-\mu_c)^T \Sigma_c^{-1}(x-\mu_c)$ |
+| **Naive Bayes MVG** | Assume feature independence | $\Sigma_{c, \text{Naive}} = \Sigma_c^* \odot I$ |
+| **Tied MVG** | Assume shared covariance across classes | $\Sigma_{\text{Tied}} = \frac{1}{N} \sum_{c} N_c \Sigma_c^*$ |
